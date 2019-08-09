@@ -1,0 +1,15 @@
+# -*- coding: utf-8 -*-
+import telebot
+from telebot.types import Message
+
+token = '986506562:AAHidjX4ZMeRpNdXadU7nqq47XlACVfOWRI'
+
+bot = telebot.TeleBot(token)
+
+@bot.message_handler(content_types=["text"])
+def repeat_all_messages(message: Message): # Название функции не играет никакой роли, в принципе
+    bot.send_message(message.chat.id, message.text)
+    if __name__ == '__main__':
+        bot.polling(none_stop=True)
+
+bot.polling(timeout=50)
