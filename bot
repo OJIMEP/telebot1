@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import telebot
-from telebot.types import Message
+from telebot import types
+from telebot.types import Message, User
 
 token = '986506562:AAHidjX4ZMeRpNdXadU7nqq47XlACVfOWRI'
 sticker_id = 'CAADAgADBwADwDZPE0hhd1MIpyLHFgQ'
+users = set()
 
 bot = telebot.TeleBot(token)
 
@@ -14,12 +16,27 @@ def command_handler(message: Message):
 @bot.message_handler(content_types=["text"])
 @bot.edited_message_handler(content_types=["text"])
 def repeat_all_messages(message: Message):
-    if 'привет' in message.text:
-        bot.send_message(message.chat.id, 'пошел вон')
-        return
+    if 'Привет' in message.text:
+        if  message.from_user.id in users:
+            bot.send_message(message.chat.id, 'опять пошел вон')
+            return
+        else:
+            bot.send_message(message.chat.id, 'пошел вон')
+            users.add(message.from_user.id)
+            return
 
 @bot.message_handler(content_types=["sticker"])
 def repeat_sticker(message: Message):
     bot.send_sticker(message.chat.id, sticker_id)
+
+@bot.inline_handler(lambda query: query.query)
+def query_text(inline_query):
+    try:
+        print(inline_query)
+        r = types.InlineQueryResultArticle('1', 'Result', types.InputTextMessageContent('Result message.'))
+        r2 = types.InlineQueryResultArticle('2', 'Result2', types.InputTextMessageContent('Result message2.'))
+        bot.answer_inline_query(inline_query.id, [r, r2])
+    except Exception as e:
+        print(e)
 
 bot.polling(timeout = 60)
