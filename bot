@@ -3,11 +3,23 @@ import telebot
 from telebot.types import Message
 
 token = '986506562:AAHidjX4ZMeRpNdXadU7nqq47XlACVfOWRI'
+sticker_id = 'CAADAgADBwADwDZPE0hhd1MIpyLHFgQ'
 
 bot = telebot.TeleBot(token)
 
+@bot.message_handler(commands=["start", "help"])
+def command_handler(message: Message):
+    bot.reply_to(message, 'нечего ответить')
+
 @bot.message_handler(content_types=["text"])
-def repeat_all_messages(message: Message): # Название функции не играет никакой роли, в принципе
-    bot.reply_to(message, message.text)
+@bot.edited_message_handler(content_types=["text"])
+def repeat_all_messages(message: Message):
+    if 'привет' in message.text:
+        bot.send_message(message.chat.id, 'пошел вон')
+        return
+
+@bot.message_handler(content_types=["sticker"])
+def repeat_sticker(message: Message):
+    bot.send_sticker(message.chat.id, sticker_id)
 
 bot.polling(timeout = 60)
